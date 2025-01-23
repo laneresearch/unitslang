@@ -5,17 +5,35 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA/4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAERERERERERERAAAAAAAAERAQAAAAAAEBEAEAAAAAEAEQABAAAAEAARAAAQAAEAABEAAAEAEAAAEQAAABEAAAARAAAAEQAAABEAAAEAEAAAEQAAEAABAAARAAEAAAAQABEAEAAAAAEAEQEAAAAAABERERAAAAAAAAEREREREREREAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" type="image/x-icon">
     
-    <!-- Preload hints -->
+    <!-- Preload hints with proper MIME type -->
     <link rel="preload" href="parser.js" as="script">
-    <link rel="preload" href="parser.wasm" as="fetch" crossorigin>
+    <link rel="preload" href="parser.wasm.gz" as="fetch" crossorigin type="application/wasm">
 </head>
 <body>
-    <!-- Load WASM module early -->
-    <script src="parser.js"></script>
     <script>
-        // Initialize WASM loading as early as possible
-        const wasmPromise = Module();
+        // Configure WASM loading
+        var Module = {
+            locateFile: function(path) {
+                if (path.endsWith('.wasm')) {
+                    return 'parser.wasm.gz';
+                }
+                return path;
+            },
+            onRuntimeInitialized: function() {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+            },
+            fetchSettings: {
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/wasm',
+                    'Content-Encoding': 'gzip'
+                }
+            }
+        };
     </script>
+    <!-- Load WASM module once -->
+    <script async src="parser.js"></script>
 
     <div class="header">
         <div class="title-group">
