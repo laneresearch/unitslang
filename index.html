@@ -10,6 +10,7 @@
         // Configure WASM loading
         var Module = {
             wasmBinary: null,
+            noInitialRun: true,
             locateFile: function(path) {
                 if (path.endsWith('.wasm')) {
                     return 'parser.wasm.gz';
@@ -22,22 +23,28 @@
             }
         };
 
-        // Fetch and load WASM file manually
-        fetch('parser.wasm.gz')
+        // Load parser.js first
+        var script = document.createElement('script');
+        script.src = 'parser.js';
+        script.onload = function() {
+            // After parser.js loads, fetch and load WASM
+            fetch('parser.wasm.gz', {
+                headers: {
+                    'Accept': 'application/wasm'
+                }
+            })
             .then(response => response.arrayBuffer())
             .then(buffer => {
                 Module.wasmBinary = buffer;
-                // Load parser.js after setting wasmBinary
-                var script = document.createElement('script');
-                script.src = 'parser.js';
-                script.async = true;
-                script.defer = true;
-                document.body.appendChild(script);
+                // The Module._initialize() call will happen automatically
+                // since parser.js is already loaded
             })
             .catch(error => {
                 console.error('Failed to load WASM:', error);
                 document.getElementById('loading').textContent = 'Failed to load WASM module: ' + error.message;
             });
+        };
+        document.body.appendChild(script);
     </script>
 
     <div class="header">
