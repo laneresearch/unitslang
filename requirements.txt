@@ -1,4 +1,0 @@
-# requirements.txt
-
-# No external dependencies are required for the current server implementation.
-# Uncomment and add any additional libraries you may need in the future.
