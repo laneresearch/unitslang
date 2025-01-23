@@ -4,15 +4,12 @@
     <title>ExprUA Demo</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA/4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAERERERERERERAAAAAAAAERAQAAAAAAEBEAEAAAAAEAEQABAAAAEAARAAAQAAEAABEAAAEAEAAAEQAAABEAAAARAAAAEQAAABEAAAEAEAAAEQAAEAABAAARAAEAAAAQABEAEAAAAAEAEQEAAAAAABERERAAAAAAAAEREREREREREAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" type="image/x-icon">
-    
-    <!-- Preload hints with proper MIME type -->
-    <link rel="preload" href="parser.js" as="script">
-    <link rel="preload" href="parser.wasm.gz" as="fetch" crossorigin type="application/wasm">
 </head>
 <body>
     <script>
         // Configure WASM loading
         var Module = {
+            wasmBinary: null,
             locateFile: function(path) {
                 if (path.endsWith('.wasm')) {
                     return 'parser.wasm.gz';
@@ -22,18 +19,23 @@
             onRuntimeInitialized: function() {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('content').style.display = 'block';
-            },
-            fetchSettings: {
-                credentials: 'same-origin',
-                headers: {
-                    'Content-Type': 'application/wasm',
-                    'Content-Encoding': 'gzip'
-                }
             }
         };
+
+        // Fetch and load WASM file manually
+        fetch('parser.wasm.gz')
+            .then(response => response.arrayBuffer())
+            .then(buffer => {
+                Module.wasmBinary = buffer;
+                var script = document.createElement('script');
+                script.src = 'parser.js';
+                document.body.appendChild(script);
+            })
+            .catch(error => {
+                console.error('Failed to load WASM:', error);
+                document.getElementById('loading').textContent = 'Failed to load WASM module: ' + error.message;
+            });
     </script>
-    <!-- Load WASM module once -->
-    <script async src="parser.js"></script>
 
     <div class="header">
         <div class="title-group">

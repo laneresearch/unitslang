@@ -10,6 +10,24 @@ const content = document.getElementById('content');
 const darkModeToggle = document.getElementById('darkModeToggle');
 const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
 
+// Configure WASM loading
+window.Module = {
+    locateFile: function(path) {
+        if (path.endsWith('.wasm')) {
+            return 'parser.wasm.gz';
+        }
+        return path;
+    },
+    onRuntimeInitialized: function() {
+        console.log('WASM Runtime initialized');
+    }
+};
+
+// Load the WASM module script
+const script = document.createElement('script');
+script.src = 'parser.js';
+document.head.appendChild(script);
+
 function setTheme(isDark) {
     document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
     if (inputEditor && outputEditor) {
