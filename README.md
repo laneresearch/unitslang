@@ -30,4 +30,4 @@ python server.py
 - `app.js` - Main application logic
 - `editor.js` - Code editor implementation
 - `styles.css` - Application styling
-- `language.js` - Language-specific functionality 
+- `language.js` - Language-specific functionality
