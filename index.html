@@ -27,8 +27,11 @@
             .then(response => response.arrayBuffer())
             .then(buffer => {
                 Module.wasmBinary = buffer;
+                // Load parser.js after setting wasmBinary
                 var script = document.createElement('script');
                 script.src = 'parser.js';
+                script.async = true;
+                script.defer = true;
                 document.body.appendChild(script);
             })
             .catch(error => {
@@ -87,9 +90,6 @@
         </div>
     </div>
 
-    <!-- Load WASM module -->
-    <script src="parser.js"></script>
-    
     <!-- Load Monaco and initialize app -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.js"></script>
     <script type="module" src="app.js"></script>
